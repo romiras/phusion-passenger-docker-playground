@@ -2,6 +2,7 @@ FROM phusion/passenger-ruby24:latest
 
 # Set correct environment variables.
 #ENV HOME /root
+ENV RUBY_VERSION=2.4.10
 
 # Use baseimage-docker's init process.
 CMD ["/sbin/my_init"]
@@ -30,17 +31,21 @@ CMD ["/sbin/my_init"]
 
 # ...put your own build instructions here...
 
+COPY --chown=app:app ./src/Gemfile* /tmp/
+RUN cd /tmp && bundle install
+
 # Enable Nginx and Passenger
 RUN rm -f /etc/service/nginx/down
 
-#RUN rm /etc/nginx/sites-enabled/default
-#ADD ./etc/nginx/sites-enabled/webapp.conf /etc/nginx/sites-enabled/webapp.conf
-#RUN mkdir /home/app/webapp
-
-#RUN ...commands to place your web app in /home/app/webapp...
+RUN rm /etc/nginx/sites-enabled/default
+ADD ./etc/nginx/sites-enabled/webapp.conf /etc/nginx/sites-enabled/webapp.conf
+RUN mkdir /home/app/webapp
 
 # This copies your web app with the correct ownership.
-# COPY --chown=app:app /local/path/of/your/app /home/app/webapp
+COPY --chown=app:app ./src /home/app/webapp
+
+RUN cd /home/app/webapp && \
+	bundle install
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
