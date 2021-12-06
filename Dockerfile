@@ -49,6 +49,8 @@ RUN rm -f /etc/service/nginx/down
 
 RUN rm /etc/nginx/sites-enabled/default
 ADD ./etc/nginx/sites-enabled/webapp.conf /etc/nginx/sites-enabled/webapp.conf
+ADD ./etc/nginx/nginx.conf /etc/nginx/nginx.conf
+
 RUN mkdir /home/app/webapp
 
 # This copies your web app with the correct ownership.
