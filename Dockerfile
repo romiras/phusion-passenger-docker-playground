@@ -31,6 +31,16 @@ CMD ["/sbin/my_init"]
 
 # ...put your own build instructions here...
 
+RUN mkdir -p /opt/local/share/mime/packages && \
+	curl -o /opt/local/share/mime/packages/freedesktop.org.xml https://cgit.freedesktop.org/xdg/shared-mime-info/plain/freedesktop.org.xml.in?h=Release-1-9
+
+RUN gem install racc -v 1.5.2
+RUN gem install nokogiri -v 1.10.10
+RUN gem install mimemagic -v 0.3.10
+RUN gem install mini_portile2 -v 2.4.0
+
+RUN gem install bundler -v '2.1.4'
+
 COPY --chown=app:app ./src/Gemfile* /tmp/
 RUN cd /tmp && bundle install
 
@@ -45,7 +55,9 @@ RUN mkdir /home/app/webapp
 COPY --chown=app:app ./src /home/app/webapp
 
 RUN cd /home/app/webapp && \
-	bundle install
+	bundle install --jobs 8 && \
+	RAILS_ENV=${PASSENGER_APP_ENV} bundle exec rails secret && \
+	RAILS_ENV=${PASSENGER_APP_ENV} bundle exec rails about
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

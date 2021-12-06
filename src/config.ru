@@ -1,8 +1,5 @@
-# config.ru (run with rackup)
-require 'rubygems'
-require 'bundler'
+# This file is used by Rack-based servers to start the application.
 
-Bundler.require
+require_relative 'config/environment'
 
-require './server'
-run Sinatra::Application
+run Rails.application
