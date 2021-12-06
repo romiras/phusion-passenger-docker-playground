@@ -15,3 +15,9 @@ docker run \
     -t phusion-passenger-docker-playground
 ```
 2. Open <http://localhost:8888>.
+
+3. Perform load test
+
+```shell
+go-wrk -H 'Accept: */*' -H 'Cache-Control: no-cache' -H 'Host: localhost:8888/' http://localhost:8888/?delay=5
+```
